@@ -1,9 +1,9 @@
-// screens/MapSearchScreen.js
 import React, { useState } from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { GOOGLE_API_KEY } from "@env";
+import { GOOGLE_APIKEY } from "@env";
+import { MaterialIcons } from "react-native-vector-icons";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 
@@ -37,29 +37,33 @@ const MapSearchScreen = ({ navigation }) => {
 
       navigation.navigate("WeatherActivities", {
         cityName: details.name,
+        latitude: lat,
+        longitude: lng,
       });
     }
   };
 
   return (
     <View style={styles.container}>
-      <GooglePlacesAutocomplete
-        placeholder="Search for a place"
-        fetchDetails={true}
-        onPress={handlePlaceSelect}
-        query={{
-          key: GOOGLE_API_KEY,
-          language: "en",
-        }}
-        styles={{
-          container: styles.autocompleteContainer,
-          textInput: styles.textInput,
-          listView: styles.listView,
-        }}
-        enablePoweredByContainer={false}
-        keyboardShouldPersistTaps="handled"
-        listViewDisplayed={false}
-      />
+      <View style={styles.searchBarContainer}>
+        <GooglePlacesAutocomplete
+          placeholder="Search for a place"
+          fetchDetails={true}
+          onPress={handlePlaceSelect}
+          query={{
+            key: GOOGLE_APIKEY,
+            language: "en",
+          }}
+          styles={{
+            container: styles.autocompleteContainer,
+            textInput: styles.textInput,
+            listView: styles.listView,
+          }}
+          enablePoweredByContainer={false}
+          keyboardShouldPersistTaps="handled"
+          listViewDisplayed={false}
+        />
+      </View>
 
       <MapView style={styles.map} region={region}>
         {selectedLocation && (
@@ -70,6 +74,21 @@ const MapSearchScreen = ({ navigation }) => {
           />
         )}
       </MapView>
+
+      <View style={styles.actionButtonsContainer}>
+        <TouchableOpacity style={styles.floatingActionButton}>
+          <MaterialIcons name="my-location" size={30} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.floatingActionButton}>
+          <MaterialIcons name="search" size={30} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          Find places and activities near you!
+        </Text>
+      </View>
     </View>
   );
 };
@@ -77,26 +96,35 @@ const MapSearchScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f5f5f5",
   },
-  map: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
-  autocompleteContainer: {
+  searchBarContainer: {
     position: "absolute",
     top: 40,
     left: 10,
     right: 10,
-    zIndex: 1,
+    zIndex: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: "#ffffff",
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  autocompleteContainer: {
+    flex: 1,
+    backgroundColor: "transparent",
   },
   textInput: {
     height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingLeft: 10,
-    backgroundColor: "white",
+    borderRadius: 25,
+    backgroundColor: "#f0f0f0",
+    paddingLeft: 20,
     fontSize: 16,
+    color: "#555",
   },
   listView: {
     backgroundColor: "white",
@@ -104,6 +132,49 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 5,
     marginTop: 5,
+  },
+  map: {
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+  },
+  actionButtonsContainer: {
+    position: "absolute",
+    bottom: 60,
+    right: 20,
+    zIndex: 2,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  floatingActionButton: {
+    backgroundColor: "#FFAA00",
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    marginLeft: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    zIndex: 2,
+  },
+  footerText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+    backgroundColor: "#FFAA00",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 20,
   },
 });
 
