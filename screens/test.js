@@ -1,33 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity, Alert } from "react-native";
-import { MaterialCommunityIcons } from "react-native-vector-icons";
-import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity } from "react-native";
 import { OPENWEATHER_APIKEY, GOOGLE_APIKEY } from "@env";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Make sure to install this
+import { MaterialCommunityIcons } from "react-native-vector-icons";
 
-const WeatherActivitiesScreen = ({ route }) => {
+const WeatherActivitiesScreen = ({ route, navigation }) => {
   const { latitude, longitude, cityName } = route.params;
   const [weather, setWeather] = useState(null);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation();
-
-  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     fetchWeatherData();
   }, [latitude, longitude]);
-
-  async function getUserToken() {
-    try {
-      const token = await AsyncStorage.getItem('userToken');
-      return token;
-    } catch (error) {
-      console.error("Error retrieving user token", error);
-      return null;  // Return null if no token is found
-    }
-  }
 
   const fetchWeatherData = async () => {
     try {
@@ -73,36 +57,6 @@ const WeatherActivitiesScreen = ({ route }) => {
     return "tourist_attraction"; // Default: Tourist attractions
   };
 
-  const handleFavorite = async (activity) => {
-    try {
-      const token = await AsyncStorage.getItem("userToken"); // Assuming the token is stored in AsyncStorage
-      if (!token) {
-        Alert.alert("Please login to add to favorites");
-        navigation.navigate("Login");
-        return;
-      }
-
-      const response = await axios.post("http://192.168.1.132:5000/addFavorite", {
-        activityId: activity.place_id,
-        activityName: activity.name,
-        activityImage: activity.photos ? activity.photos[0].photo_reference : "",
-        activityAddress: activity.vicinity,
-        token, // Send token for authentication
-      });
-
-      if (response.data.success) {
-        Alert.alert("Activity added to favorites!");
-        // Optionally, update the favorites list after adding to the backend
-        setFavorites((prevFavorites) => [...prevFavorites, activity]);
-      } else {
-        Alert.alert("Error adding activity to favorites");
-      }
-    } catch (error) {
-      console.error("Error adding favorite:", error);
-      Alert.alert("Something went wrong. Please try again.");
-    }
-  };
-
   const renderWeatherIcon = (condition) => {
     switch (condition) {
       case "clear":
@@ -128,22 +82,26 @@ const WeatherActivitiesScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tap the weather icon to see the next 7-Day forecast</Text>
-
+      <Text style={styles.title}>tap the weather icon to see the next 7-Days weather </Text>
       {weather && (
         <TouchableOpacity
           style={styles.weatherInfo}
-          onPress={() => navigation.navigate("WeatherForecast", { latitude, longitude })}
+          onPress={() =>
+            navigation.navigate("WeatherForecast", { latitude, longitude })
+          }
         >
           {renderWeatherIcon(weather.weather[0].main.toLowerCase())}
           <Text style={styles.cityName}>{cityName}</Text>
-          <Text style={styles.temperature}>{Math.round(weather.main.temp)}°C</Text>
-          <Text style={styles.weatherDescription}>{weather.weather[0].description}</Text>
+          <Text style={styles.temperature}>
+            {Math.round(weather.main.temp)}°C
+          </Text>
+          <Text style={styles.weatherDescription}>
+            {weather.weather[0].description}
+          </Text>
         </TouchableOpacity>
       )}
 
       <Text style={styles.sectionTitle}>Nearby Activities</Text>
-
       {activities.length > 0 ? (
         <FlatList
           data={activities}
@@ -160,10 +118,11 @@ const WeatherActivitiesScreen = ({ route }) => {
               )}
               <Text style={styles.activityName}>{item.name}</Text>
               <Text style={styles.activityAddress}>{item.vicinity}</Text>
-              {item.rating && <Text style={styles.activityRating}>Rating: {item.rating}⭐</Text>}
-              <TouchableOpacity onPress={() => handleFavorite(item)}>
-                <MaterialCommunityIcons name="heart" size={30} color="red" />
-              </TouchableOpacity>
+              {item.rating && (
+                <Text style={styles.activityRating}>
+                  Rating: {item.rating}⭐
+                </Text>
+              )}
             </View>
           )}
         />
@@ -175,94 +134,3 @@ const WeatherActivitiesScreen = ({ route }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#f5f5f5",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  weatherInfo: {
-    alignItems: "center",
-    marginVertical: 20,
-    padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  cityName: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 8,
-    color: "#333",
-  },
-  temperature: {
-    fontSize: 48,
-    fontWeight: "200",
-    marginBottom: 8,
-    color: "#FFAA00",
-  },
-  weatherDescription: {
-    fontSize: 18,
-    color: "#666",
-    textTransform: "capitalize",
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginVertical: 16,
-    color: "#444",
-  },
-  activityItem: {
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  activityImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 8,
-  },
-  activityName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 8,
-  },
-  activityAddress: {
-    fontSize: 14,
-    color: "#777",
-  },
-  activityRating: {
-    fontSize: 14,
-    color: "#FFAA00",
-  },
-  noActivitiesMessage: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginTop: 16,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#444",
-  },
-});
-
-export default WeatherActivitiesScreen;

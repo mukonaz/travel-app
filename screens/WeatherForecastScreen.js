@@ -9,12 +9,14 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { OPENWEATHER_APIKEY, GOOGLE_APIKEY } from "@env";
+import { MaterialCommunityIcons } from "react-native-vector-icons";
 
 const WeatherForecastScreen = ({ route }) => {
   const { latitude, longitude } = route.params;
   const [forecast, setForecast] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activities, setActivities] = useState([]);
+  const [activeDay, setActiveDay] = useState(null);
 
   useEffect(() => {
     fetchForecast();
@@ -57,17 +59,33 @@ const WeatherForecastScreen = ({ route }) => {
   };
 
   const getActivityTypeBasedOnWeather = (condition) => {
-    if (condition === "clear") return "park"; // Sunny: Parks or outdoor activities
-    if (condition.includes("cloud")) return "museum"; // Cloudy: Museums or indoor sightseeing
-    if (condition.includes("rain") || condition.includes("drizzle")) return "movie_theater"; // Rainy: Movie theaters
-    if (condition.includes("snow") || condition.includes("cold")) return "cafe"; // Cold: Cozy indoor places
-    return "tourist_attraction"; // Default: Tourist attractions
+    if (condition === "clear") return "park";
+    if (condition.includes("cloud")) return "museum";
+    if (condition.includes("rain") || condition.includes("drizzle")) return "movie_theater";
+    if (condition.includes("snow") || condition.includes("cold")) return "cafe";
+    return "tourist_attraction";
   };
 
   const handleDayPress = async (day) => {
     setLoading(true);
+    setActiveDay(day.dt); // Mark this day as active
     await fetchActivities(latitude, longitude, day.weather[0].main.toLowerCase());
     setLoading(false);
+  };
+
+  const renderWeatherIcon = (condition) => {
+    switch (condition) {
+      case "clear":
+        return <MaterialCommunityIcons name="weather-sunny" size={24} color="#FFAA00" />;
+      case "clouds":
+        return <MaterialCommunityIcons name="weather-cloudy" size={24} color="#777777" />;
+      case "rain":
+        return <MaterialCommunityIcons name="weather-rainy" size={24} color="#0000FF" />;
+      case "snow":
+        return <MaterialCommunityIcons name="weather-snowy" size={24} color="#FFFFFF" />;
+      default:
+        return <MaterialCommunityIcons name="weather-cloudy" size={24} color="#777777" />;
+    }
   };
 
   const renderActivity = ({ item }) => (
@@ -93,18 +111,24 @@ const WeatherForecastScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>7-Day Weather Forecast</Text>
-      {loading ? (
+      {loading && !forecast.length ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <>
           <FlatList
             data={forecast}
             keyExtractor={(item) => item.dt.toString()}
+            
+      
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.dayContainer}
+                style={[
+                  styles.dayContainer,
+                  activeDay === item.dt && styles.activeDayContainer,
+                ]}
                 onPress={() => handleDayPress(item)}
               >
+                {renderWeatherIcon(item.weather[0].main.toLowerCase())}
                 <Text style={styles.dayText}>
                   {new Date(item.dt * 1000).toDateString()}
                 </Text>
@@ -124,7 +148,7 @@ const WeatherForecastScreen = ({ route }) => {
             />
           ) : (
             <Text style={styles.noActivitiesMessage}>
-              There are no activities available for this weather in your area.
+              click on a day to see nearby activities
             </Text>
           )}
         </>
@@ -156,13 +180,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
+  activeDayContainer: {
+    borderWidth: 2,
+    borderColor: "#FFAA00",
+  },
   dayText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#333",
+    marginVertical: 4,
   },
   tempText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#777",
   },
   activityList: {
