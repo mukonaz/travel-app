@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity } from "react-native";
 import { OPENWEATHER_APIKEY, GOOGLE_APIKEY } from "@env";
 import { MaterialCommunityIcons } from "react-native-vector-icons";
 
-const WeatherActivitiesScreen = ({ route }) => {
+const WeatherActivitiesScreen = ({ route, navigation }) => {
   const { latitude, longitude, cityName } = route.params;
   const [weather, setWeather] = useState(null);
   const [activities, setActivities] = useState([]);
@@ -82,8 +82,14 @@ const WeatherActivitiesScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>tap the weather icon to see the next 7-Days weather </Text>
       {weather && (
-        <View style={styles.weatherInfo}>
+        <TouchableOpacity
+          style={styles.weatherInfo}
+          onPress={() =>
+            navigation.navigate("WeatherForecast", { latitude, longitude })
+          }
+        >
           {renderWeatherIcon(weather.weather[0].main.toLowerCase())}
           <Text style={styles.cityName}>{cityName}</Text>
           <Text style={styles.temperature}>
@@ -92,7 +98,7 @@ const WeatherActivitiesScreen = ({ route }) => {
           <Text style={styles.weatherDescription}>
             {weather.weather[0].description}
           </Text>
-        </View>
+        </TouchableOpacity>
       )}
 
       <Text style={styles.sectionTitle}>Nearby Activities</Text>
@@ -209,6 +215,12 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: "center",
     marginTop: 16,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 16,
+    color: "#444",
   },
 });
 

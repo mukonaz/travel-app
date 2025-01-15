@@ -4,7 +4,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import MapSearchScreen from "./screens/MapSearchScreen";
 import WeatherActivitiesScreen from "./screens/WeatherActivitiesScreen";
 import "react-native-gesture-handler";
-
+import WeatherForecastScreen from "./screens/WeatherForecastScreen";
+import SuggestedActivitiesScreen from "./screens/SuggestedActivitiesScreen";
 
 const Stack = createStackNavigator();
 
@@ -21,6 +22,16 @@ const App = () => {
           name="WeatherActivities"
           component={WeatherActivitiesScreen}
           options={{ title: "Weather & Activities" }}
+        />
+        <Stack.Screen
+          name="WeatherForecast"
+          component={WeatherForecastScreen}
+          options={{ title: "7-Day Forecast" }}
+        />
+        <Stack.Screen
+          name="SuggestedActivities"
+          component={SuggestedActivitiesScreen}
+          options={{ title: "Suggested Activities" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
