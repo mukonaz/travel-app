@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "travel-plan-app",
-    "slug": "travel-plan-app",
+    "slug": "travel-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,9 @@
     },
     "ios": {
       "supportsTablet": true,
-      "permissions": ["ACCESS_FINE_LOCATION"]
+      "permissions": [
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -24,6 +26,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1f64b041-4df9-4246-b26a-bca12d54b026"
+      }
+    },
+    "owner": "mukona"
   }
 }

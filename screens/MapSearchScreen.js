@@ -35,7 +35,7 @@ const MapSearchScreen = ({ navigation }) => {
         address: details.formatted_address,
       });
 
-      navigation.navigate("WeatherActivities", {
+      navigation.navigate("Weather Activities", {
         cityName: details.name,
         latitude: lat,
         longitude: lng,

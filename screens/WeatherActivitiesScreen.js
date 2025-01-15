@@ -133,7 +133,7 @@ const WeatherActivitiesScreen = ({ route }) => {
       {weather && (
         <TouchableOpacity
           style={styles.weatherInfo}
-          onPress={() => navigation.navigate("WeatherForecast", { latitude, longitude })}
+          onPress={() => navigation.navigate("Weather Forecast", { latitude, longitude })}
         >
           {renderWeatherIcon(weather.weather[0].main.toLowerCase())}
           <Text style={styles.cityName}>{cityName}</Text>
