@@ -4,7 +4,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from 'react-native-vector-icons';
-
 import MapSearchScreen from './screens/MapSearchScreen';
 import WeatherActivitiesScreen from './screens/WeatherActivitiesScreen';
 import WeatherForecastScreen from './screens/WeatherForecastScreen';
@@ -105,19 +104,18 @@ const TabNavigator = () => {
 const App = () => {
   const [locationData, setLocationData] = React.useState(null);
 
+  
   return (
     <LocationContext.Provider value={{ locationData, setLocationData }}>
       <NavigationContainer>
-        <Stack.Navigator 
+        <Stack.Navigator
           initialRouteName="MainTabs"
           screenOptions={{
             headerShown: false,
           }}
         >
-          <Stack.Screen 
-            name="MainTabs" 
-            component={TabNavigator}
-          />
+          <Stack.Screen name="MainTabs" component={TabNavigator} />
+          <Stack.Screen name="Map Search" component={MapSearchScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />

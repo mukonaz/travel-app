@@ -18,13 +18,13 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://192.168.0.130:5000/login", {
+      const response = await axios.post("http://192.168.1.139:5000/login", {
         email,
         password,
       });
-      const { userId } = response.data; // Using userId directly
+      const { userId } = response.data; 
       Alert.alert("Login successful!");
-      navigation.navigate("Profile", { userId }); // Pass userId to Profile
+      navigation.navigate("Profile", { userId });
     } catch (error) {
       Alert.alert("Login failed", error.response?.data?.message || "An error occurred");
     }

@@ -13,6 +13,7 @@ import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileScreen = ({ navigation }) => {
+  
   const [favorites, setFavorites] = useState([]);
   const [username, setUsername] = useState(""); // Placeholder username; replace with dynamic data if needed.
 const [userId, setUserId] = useState("");
@@ -42,7 +43,7 @@ useEffect(() => {
 
   const fetchUsername = async () => {
     try {
-      const response = await axios.get(`http://192.168.0.130:5000/user/${userId}`);
+      const response = await axios.get(`http://192.168.1.139:5000/user/${userId}`);
       setUsername(response.data.username);
     } catch (error) {
       console.error("Error fetching username:", error);
@@ -52,7 +53,7 @@ useEffect(() => {
 
   const fetchFavorites = async () => {
     try {
-      const response = await axios.get(`http://192.168.0.130:5000/getFavorites?userId=${userId}`);
+      const response = await axios.get(`http://192.168.1.139:5000/getFavorites?userId=${userId}`);
       if (response.data.length === 0) {
         setFavorites([]);
       } else {

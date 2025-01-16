@@ -1,3 +1,5 @@
+require("dotenv").config(); // Load environment variables from .env
+
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -5,19 +7,19 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000; // Use PORT from .env or default to 5000
 
-// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// MongoDB Atlas connection
-mongoose.connect(
-  "mongodb+srv://livhumukona9:koofTNOF1YCAhonX@cluster0.xcbz8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-  { useNewUrlParser: true, useUnifiedTopology: true }
-)
+// Connect to MongoDB using environment variable
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log(err));
+  .catch((err) => console.log("MongoDB connection error:", err));
 
 // User schema
 const userSchema = new mongoose.Schema({
@@ -34,7 +36,6 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
-// User model
 const User = mongoose.model("User", userSchema);
 
 // Register route
@@ -79,9 +80,10 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// Get user details by ID
 app.get("/user/:userId", async (req, res) => {
   const { userId } = req.params;
-  
+
   try {
     const user = await User.findById(userId).select("username");
     if (!user) {
@@ -93,11 +95,18 @@ app.get("/user/:userId", async (req, res) => {
   }
 });
 
-// Add to favorites route
+// Add favorite activity
 app.post("/addFavorite", async (req, res) => {
-  const { userId, activityId, activityName, activityImage, activityAddress } = req.body;
+  const { userId, activityId, activityName, activityImage, activityAddress } =
+    req.body;
 
-  if (!userId || !activityId || !activityName || !activityImage || !activityAddress) {
+  if (
+    !userId ||
+    !activityId ||
+    !activityName ||
+    !activityImage ||
+    !activityAddress
+  ) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -107,24 +116,35 @@ app.post("/addFavorite", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const alreadyFavorite = user.favorites.some((fav) => fav.activityId === activityId);
+    const alreadyFavorite = user.favorites.some(
+      (fav) => fav.activityId === activityId
+    );
     if (alreadyFavorite) {
       return res.status(400).json({ message: "Activity already in favorites" });
     }
 
-    user.favorites.push({ activityId, activityName, activityImage, activityAddress });
+    user.favorites.push({
+      activityId,
+      activityName,
+      activityImage,
+      activityAddress,
+    });
     await user.save();
 
-    res.status(200).json({ message: "Activity added to favorites", favorites: user.favorites });
+    res
+      .status(200)
+      .json({
+        message: "Activity added to favorites",
+        favorites: user.favorites,
+      });
   } catch (error) {
     res.status(500).json({ message: "Error adding to favorites", error });
   }
 });
 
-
-// Get favorites route
+// Get favorites by user ID
 app.get("/getFavorites", async (req, res) => {
-  const { userId } = req.query; // Expecting userId in query params.
+  const { userId } = req.query;
 
   try {
     const user = await User.findById(userId).select("favorites");
@@ -132,15 +152,13 @@ app.get("/getFavorites", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if there are favorites, if not, send an empty array
     res.status(200).json(user.favorites || []);
   } catch (error) {
     res.status(500).json({ message: "Error fetching favorites", error });
   }
 });
 
-
-// Start server
+// Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
