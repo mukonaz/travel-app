@@ -16,22 +16,24 @@
       "supportsTablet": true,
       "permissions": [
         "ACCESS_FINE_LOCATION"
-      ]
+      ],
+      "bundleIdentifier": "com.thapelo074.travelapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.thapelo074.travelapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "1f64b041-4df9-4246-b26a-bca12d54b026"
+        "projectId": "4493863b-6c6e-4a02-b991-94467bae989c"
       }
     },
-    "owner": "mukona"
+    "owner": "thapelo074"
   }
 }
